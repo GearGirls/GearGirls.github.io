@@ -5,7 +5,7 @@ import           Hakyll
 
 --------------------------------------------------------------------------------
 cfg :: Configuration
-cfg = defaultConfiguration {destinationDirectory = "../"}
+cfg = defaultConfiguration {deployCommand = "rsync -av ./_site/ ../"}
 
 main :: IO ()
 main = hakyllWith cfg $ do
