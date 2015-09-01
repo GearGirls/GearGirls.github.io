@@ -49,3 +49,4 @@ cabal.sandbox.config
 .stack-work/
 _site
 _cache
+/site-builder/TAGS

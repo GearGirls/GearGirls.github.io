@@ -12,7 +12,12 @@ main = hakyllWith cfg $ do
     match "images/*" $ do
         route   idRoute
         compile copyFileCompiler
-
+    match "font-awesome/**" $ do
+        route   idRoute
+        compile copyFileCompiler
+    match "font/*" $ do
+        route   idRoute
+        compile copyFileCompiler
     match "css/*" $ do
         route   idRoute
         compile compressCssCompiler
@@ -51,7 +56,7 @@ main = hakyllWith cfg $ do
             posts <- recentFirst =<< loadAll "posts/*"
             let indexCtx =
                     listField "posts" postCtx (return posts) `mappend`
-                    constField "title" "Home"                `mappend`
+                    constField "title" "Gear Girls Info"                `mappend`
                     defaultContext
 
             getResourceBody
