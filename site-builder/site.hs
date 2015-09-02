@@ -1,8 +1,10 @@
 --------------------------------------------------------------------------------
 {-# LANGUAGE OverloadedStrings #-}
-import           Data.Monoid (mappend)
-import           Hakyll
 
+import           Data.Monoid            (mappend)
+import           Hakyll
+import           Hakyll.Core.Compiler
+import           Hakyll.Core.Identifier
 --------------------------------------------------------------------------------
 cfg :: Configuration
 cfg = defaultConfiguration {deployCommand = "rsync -av ./_site/ ../"}
@@ -21,44 +23,20 @@ main = hakyllWith cfg $ do
     match "css/*" $ do
         route   idRoute
         compile compressCssCompiler
-
     match (fromList ["about.rst", "contact.markdown"]) $ do
         route   $ setExtension "html"
         compile $ pandocCompiler
             >>= loadAndApplyTemplate "templates/default.html" defaultContext
             >>= relativizeUrls
-
-    match "posts/*" $ do
-        route $ setExtension "html"
-        compile $ pandocCompiler
-            >>= loadAndApplyTemplate "templates/post.html"    postCtx
-            >>= loadAndApplyTemplate "templates/default.html" postCtx
-            >>= relativizeUrls
-
-    create ["archive.html"] $ do
-        route idRoute
-        compile $ do
-            posts <- recentFirst =<< loadAll "posts/*"
-            let archiveCtx =
-                    listField "posts" postCtx (return posts) `mappend`
-                    constField "title" "Archives"            `mappend`
-                    defaultContext
-
-            makeItem ""
-                >>= loadAndApplyTemplate "templates/archive.html" archiveCtx
-                >>= loadAndApplyTemplate "templates/default.html" archiveCtx
-                >>= relativizeUrls
-
-
+    match "org-docs/*" $ compile $ pandocCompiler
     match "index.html" $ do
         route idRoute
         compile $ do
-            posts <- recentFirst =<< loadAll "posts/*"
+            agenda <- load "org-docs/meeting-planner.org"
             let indexCtx =
-                    listField "posts" postCtx (return posts) `mappend`
+                    agendaField agenda `mappend`
                     constField "title" "Gear Girls Info"                `mappend`
                     defaultContext
-
             getResourceBody
                 >>= applyAsTemplate indexCtx
                 >>= loadAndApplyTemplate "templates/default.html" indexCtx
@@ -72,3 +50,7 @@ postCtx :: Context String
 postCtx =
     dateField "date" "%B %e, %Y" `mappend`
     defaultContext
+
+
+agendaField :: Item String -> Context String
+agendaField i = field "agenda" (const $ return . itemBody $ i)
