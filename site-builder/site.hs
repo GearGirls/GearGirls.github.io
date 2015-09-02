@@ -29,11 +29,14 @@ main = hakyllWith cfg $ do
             >>= loadAndApplyTemplate "templates/default.html" defaultContext
             >>= relativizeUrls
     match "org-docs/*" $ compile $ pandocCompiler
+    match "org-sections/*" $ compile $ pandocCompiler >>=
+            loadAndApplyTemplate "templates/section.html" defaultContext
+
     match "index.html" $ do
         route idRoute
         compile $ do
             videos <- load "org-docs/videos.org"
-            agenda <- load "org-docs/meeting-planner.org"
+            agenda <- load "org-sections/meeting-planner.org"
             tutorials <- load "org-docs/tutorials.org"
             let indexCtx =
                     itemField "videos" videos `mappend`
