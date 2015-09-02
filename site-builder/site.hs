@@ -42,7 +42,7 @@ main = hakyllWith cfg $ do
                     itemField "videos" videos `mappend`
                     itemField "agenda" agenda `mappend`
                     itemField "tutorials" tutorials `mappend`
-                    constField "title" "Gear Girls Info"                `mappend`
+                    constField "title" "Gear Girls Info" `mappend`
                     defaultContext
             getResourceBody
                 >>= applyAsTemplate indexCtx
