@@ -32,9 +32,13 @@ main = hakyllWith cfg $ do
     match "index.html" $ do
         route idRoute
         compile $ do
+            videos <- load "org-docs/videos.org"
             agenda <- load "org-docs/meeting-planner.org"
+            tutorials <- load "org-docs/tutorials.org"
             let indexCtx =
-                    agendaField agenda `mappend`
+                    itemField "videos" videos `mappend`
+                    itemField "agenda" agenda `mappend`
+                    itemField "tutorials" tutorials `mappend`
                     constField "title" "Gear Girls Info"                `mappend`
                     defaultContext
             getResourceBody
@@ -52,5 +56,5 @@ postCtx =
     defaultContext
 
 
-agendaField :: Item String -> Context String
-agendaField i = field "agenda" (const $ return . itemBody $ i)
+-- agendaField :: Item String -> Context String
+itemField lbl i = field lbl (const $ return . itemBody $ i)

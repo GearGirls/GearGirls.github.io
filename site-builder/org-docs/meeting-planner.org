@@ -1,1 +1,9 @@
-* Daily Planner
+* Meeting Plan First Stage
+** 6:00 - 7:00 
+*** Build Build Build 
+
+** 7:00 - 7:10
+*** Snack and Project Review
+
+** 7:10 - 8:00
+*** Build and Code     
