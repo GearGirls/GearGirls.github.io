@@ -5,6 +5,7 @@ import           Data.Monoid            (mappend)
 import           Hakyll
 import           Hakyll.Core.Compiler
 import           Hakyll.Core.Identifier
+import           Hakyll.Github
 --------------------------------------------------------------------------------
 cfg :: Configuration
 cfg = defaultConfiguration {deployCommand = "rsync -av ./_site/ ../"}
