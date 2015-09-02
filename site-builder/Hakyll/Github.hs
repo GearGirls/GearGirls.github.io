@@ -20,13 +20,13 @@ module Hakyll.Github (tdMilestone
                      ,testMilestone) where
 
 
-import           Data.Monoid                  (mconcat)
+import           Data.Monoid                     (mconcat)
 import           Data.Time
 import           Github.Issues.Milestones
 import           Hakyll
+import           Text.Blaze.Html.Renderer.Pretty
 import           Text.Blaze.XHtml5
 import           Text.Pandoc.Readers.Markdown
-
 testMilestone :: Milestone
 testMilestone = Milestone owner dueDate 3 43 0 description title url fixedDate state
   where
@@ -37,7 +37,12 @@ testMilestone = Milestone owner dueDate 3 43 0 description title url fixedDate s
     title = "Test Milestone"
     url = "test url"
     state = "Standard"
--- | Render a single
+
+
+tableMilestones milestones = table.mappend header .tbody.mconcat . fmap (tr.tdMilestone) $ milestones
+   where
+     header = mconcat . fmap (th . toHtml ) $ (["Number","Title","Due date","Url","State"]:: [String])
+-- | Render a single table entry milestone
 tdMilestone :: Milestone -> Html
 tdMilestone mileStone = mconcat dataLine
  where
