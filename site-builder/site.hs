@@ -1,7 +1,8 @@
 --------------------------------------------------------------------------------
 {-# LANGUAGE OverloadedStrings #-}
 
-import           Data.Monoid            (mappend)
+import           Data.Monoid              (mappend)
+import           Github.Issues.Milestones
 import           Hakyll
 import           Hakyll.Core.Compiler
 import           Hakyll.Core.Identifier
@@ -11,7 +12,9 @@ cfg :: Configuration
 cfg = defaultConfiguration {deployCommand = "rsync -av ./_site/ ../"}
 
 main :: IO ()
-main = hakyllWith cfg $ do
+main = do
+  (Right gear) <- milestones "geargirls" "fll"
+  hakyllWith cfg $ do
     match "images/*" $ do
         route   idRoute
         compile copyFileCompiler
@@ -32,16 +35,21 @@ main = hakyllWith cfg $ do
     match "org-docs/*" $ compile $ pandocCompiler
     match "org-sections/*" $ compile $ pandocCompiler >>=
             loadAndApplyTemplate "templates/section.html" defaultContext
-
+    create ["milestones"] $ compile $ do
+          section <- loadBody "templates/section.html"
+          milestonesCompiler gear >>=
+                    applyTemplate section defaultContext
     match "index.html" $ do
         route idRoute
         compile $ do
             videos <- load "org-docs/videos.org"
             agenda <- load "org-sections/meeting-planner.org"
             tutorials <- load "org-docs/tutorials.org"
+            milestones <- load "milestones"
             let indexCtx =
                     itemField "videos" videos `mappend`
                     itemField "agenda" agenda `mappend`
+                    itemField "milestones" milestones `mappend`
                     itemField "tutorials" tutorials `mappend`
                     constField "title" "Gear Girls Info" `mappend`
                     defaultContext
