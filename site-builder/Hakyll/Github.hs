@@ -22,6 +22,7 @@ module Hakyll.Github ( renderTableMilestones
                      ,testMilestone) where
 
 
+import           Data.Default
 import           Data.Maybe                      (fromMaybe)
 import           Data.Monoid                     (mconcat)
 import           Data.Time
@@ -31,6 +32,7 @@ import           Text.Blaze.Html.Renderer.Pretty
 import           Text.Blaze.XHtml5
 import           Text.Blaze.XHtml5.Attributes
 import           Text.Pandoc.Readers.Markdown
+import           Text.Pandoc.Writers.HTML
 
 milestonesCompiler :: [Milestone] -> Compiler (Item String)
 milestonesCompiler = makeItem . renderTableMilestones
@@ -49,15 +51,12 @@ testMilestone = Milestone owner dueDate 3 43 0 description title url fixedDate s
     url = "test url"
     state = "Standard"
 
-renderGithubDate :: GithubDate -> String
-renderGithubDate = formatTimeISO.fromGithubDate
-   where
-      formatTimeISO = formatTime defaultTimeLocale (iso8601DateFormat  (Just "%H:%M:%S"))
 tableMilestones milestones = tableWithAttrs .tbody.mappend header .mconcat . fmap (trWithAttrs.tdMilestone) $ milestones
    where
      trWithAttrs = tr ! class_ "text-left"
      tableWithAttrs = table ! class_ "table-striped table"
-     header = mconcat . fmap (th . toHtml ) $ (["Number","Title","Due date","Url","State"]:: [String])
+     header = mconcat . fmap (th . toHtml ) $ (["Number","Title","Due date","Description","State"]:: [String])
+
 -- | Render a single table entry milestone
 tdMilestone :: Milestone -> Html
 tdMilestone mileStone = mconcat dataLine
@@ -74,7 +73,24 @@ tdMilestone mileStone = mconcat dataLine
    milestoneState }) = mileStone
   dataLine :: [Html]
   dataLine = td <$> [ toHtml milestoneNumber
-                    , toHtml milestoneTitle
+                    , renderLinkWithTitle (toHtml milestoneTitle) (stringValue milestoneUrl)
                     , toHtml.maybe "" renderGithubDate $ milestoneDueOn
-                    , toHtml milestoneUrl
+                    , toHtml.renderDescription $ milestoneDescription
                     , toHtml milestoneState]
+
+
+-- | Render Help
+
+renderGithubDate :: GithubDate -> String
+renderGithubDate = formatTimeISO.fromGithubDate
+   where
+      formatTimeISO = formatTime defaultTimeLocale (iso8601DateFormat  (Just "%H:%M:%S"))
+
+
+renderLinkWithTitle title url = a ! href url $ title
+
+renderDescription :: Maybe String -> Html
+renderDescription (Nothing) = toHtml (""::String)
+renderDescription (Just str)= case fmap (writeHtml def) . readMarkdown def $ str of
+                                  (Left _) -> toHtml (""::String)
+                                  (Right str) -> toHtml str
