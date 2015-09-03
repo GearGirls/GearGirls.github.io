@@ -34,7 +34,7 @@ main = do
             >>= relativizeUrls
     match "org-docs/*" $ compile $ pandocCompiler
     match "org-sections/*" $ compile $ pandocCompiler >>=
-            loadAndApplyTemplate "templates/section.html" defaultContext
+            loadAndApplyTemplate "templates/section.html" (constField "title" "" `mappend` defaultContext)
     create ["Milestones"] $ compile $ do
           section <- loadBody "templates/section.html"
           milestonesCompiler gear >>=
