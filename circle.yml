@@ -13,14 +13,14 @@ dependencies:
 
   override:
     - if cabal --version | grep 1.23.0.0; then echo "Version 1.23.0.0"; else cd ~/ && git clone https://github.com/plow-technologies/cabal.git && cd cabal && cabal --no-require-sandbox install -j2 Cabal/ cabal-install/; fi
-    - cd ~/GearGirls.github.io/site-builder/ && cabal update
-    - cd ~/GearGirls.github.io/site-builder/ && cabal sandbox init
-    - cd ~/GearGirls.github.io/site-builder/ && cabal install --only-dependencies --enable-tests -j2 --max-backjumps=-1
+    - cd ~/GearGirls.github.io/site-builder && cabal update
+    - cd ~/GearGirls.github.io/site-builder && cabal sandbox init
+    - cd ~/GearGirls.github.io/site-builder && cabal install --only-dependencies --enable-tests -j2 --max-backjumps=-1
 
 test:
   override:
-    - cd ~/GearGirls.github.io/site-builder/ && cabal configure 
-    - cd ~/GearGirls.github.io/site-builder/ && cabal build -j2:
+    - cd ~/GearGirls.github.io/site-builder && cabal configure 
+    - cd ~/GearGirls.github.io/site-builder && cabal build -j2:
         timeout: 3000
         
 deployment:
