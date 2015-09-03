@@ -28,7 +28,7 @@ deployment:
     branch: master
     commands:       
        - cd ~/GearGirls.github.io/site-builder && cabal configure 
-       - cd ~/GearGirls.github.io/site-builder && cabal build -j2:
+       - cd ~/GearGirls.github.io/site-builder && cabal build -j2
        - cd ~/GearGirls.github.io/site-builder && ./dist/build/site/site clean
        - cd ~/GearGirls.github.io/site-builder && ./dist/build/site/site build
        - cd ~/GearGirls.github.io/site-builder && ./dist/build/site/site deploy
