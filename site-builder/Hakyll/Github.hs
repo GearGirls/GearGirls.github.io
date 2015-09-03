@@ -30,6 +30,7 @@ import           Github.Issues.Milestones
 import           Hakyll
 import           Text.Blaze.Html.Renderer.Pretty
 import           Text.Blaze.XHtml5
+import qualified Text.Blaze.XHtml5               as H
 import           Text.Blaze.XHtml5.Attributes
 import           Text.Pandoc.Readers.Markdown
 import           Text.Pandoc.Writers.HTML
@@ -76,7 +77,7 @@ tdMilestone mileStone = mconcat dataLine
                     , renderLinkWithTitle (toHtml milestoneTitle) (stringValue milestoneUrl)
                     , toHtml.maybe "" renderGithubDate $ milestoneDueOn
                     , toHtml.renderDescription $ milestoneDescription
-                    , toHtml milestoneState]
+                    , (H.span ! class_ "badge") . toHtml $ milestoneState]
 
 
 -- | Render Help

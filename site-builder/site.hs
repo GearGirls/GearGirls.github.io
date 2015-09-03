@@ -38,7 +38,7 @@ main = do
     create ["Milestones"] $ compile $ do
           section <- loadBody "templates/section.html"
           milestonesCompiler gear >>=
-                    applyTemplate section defaultContext
+                    applyTemplate section (constField "title" "Work needing to be done" `mappend` defaultContext)
     match "index.html" $ do
         route idRoute
         compile $ do
