@@ -1,0 +1,38 @@
+machine:
+  ghc:
+    version: 7.10.1
+
+  environment:
+    PATH: $HOME/.cabal/bin:$CIRCLE_ARTIFACTS:$PATH/$HOME/GearGirls.github.io/site-builder/.cabal-sandbox/bin
+
+dependencies:
+
+  cache_directories:
+    - "~/.cabal"
+    - "~/GearGirls.github.io/site-builder/.cabal-sandbox/"
+
+  override:
+    - if cabal --version | grep 1.23.0.0; then echo "Version 1.23.0.0"; else cd ~/ && git clone https://github.com/plow-technologies/cabal.git && cd cabal && cabal --no-require-sandbox install -j2 Cabal/ cabal-install/; fi
+    - cd ~/GearGirls.github.io/site-builder/ && cabal update
+    - cd ~/GearGirls.github.io/site-builder/ && cabal update
+    - cd ~/GearGirls.github.io/site-builder/ && cabal sandbox init
+    - cd ~/GearGirls.github.io/site-builder/ && cabal install --only-dependencies --enable-tests -j2 --max-backjumps=-1
+
+test:
+  override:
+    - cd ~/GearGirls.github.io/site-builder/ && cabal configure 
+    - cd ~/GearGirls.github.io/site-builder/ && cabal build -j2:
+        timeout: 3000
+        
+deployment:
+  production:
+    branch: master
+    commands:       
+       - cd ~/GearGirls.github.io/site-builder/ && cabal configure 
+       - cd ~/GearGirls.github.io/site-builder/ && cabal build -j2:
+       - cd ~/GearGirls.github.io/site-builder/ && ./dist/build/site/site clean
+       - cd ~/GearGirls.github.io/site-builder/ && ./dist/build/site/site build
+       - cd ~/GearGirls.github.io/site-builder/ && ./dist/build/site/site deploy
+       - cd ~/GearGirls.github.io/site-builder/ && git commit -am "latest deploy"
+       - cd ~/GearGirls.github.io/site-builder/ && git push origin master
+       
