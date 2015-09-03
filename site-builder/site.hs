@@ -35,7 +35,7 @@ main = do
     match "org-docs/*" $ compile $ pandocCompiler
     match "org-sections/*" $ compile $ pandocCompiler >>=
             loadAndApplyTemplate "templates/section.html" defaultContext
-    create ["milestones"] $ compile $ do
+    create ["Milestones"] $ compile $ do
           section <- loadBody "templates/section.html"
           milestonesCompiler gear >>=
                     applyTemplate section defaultContext
@@ -45,11 +45,11 @@ main = do
             videos <- load "org-docs/videos.org"
             agenda <- load "org-sections/meeting-planner.org"
             tutorials <- load "org-docs/tutorials.org"
-            milestones <- load "milestones"
+            milestones <- load "Milestones"
             let indexCtx =
                     itemField "videos" videos `mappend`
                     itemField "agenda" agenda `mappend`
-                    itemField "milestones" milestones `mappend`
+                    itemField "Milestones" milestones `mappend`
                     itemField "tutorials" tutorials `mappend`
                     constField "title" "Gear Girls Info" `mappend`
                     defaultContext
