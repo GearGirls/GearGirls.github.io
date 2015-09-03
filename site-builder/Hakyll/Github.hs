@@ -77,7 +77,7 @@ tdMilestone mileStone = mconcat dataLine
                     , renderLinkWithTitle (toHtml milestoneTitle) (stringValue milestoneUrl)
                     , toHtml.maybe "" renderGithubDate $ milestoneDueOn
                     , toHtml.renderDescription $ milestoneDescription
-                    , (H.span ! class_ "badge") . toHtml $ milestoneState]
+                    , (H.span ! class_ "label label-success") . toHtml $ milestoneState]
 
 
 -- | Render Help
