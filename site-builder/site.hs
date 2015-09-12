@@ -45,12 +45,14 @@ main = do
             videos <- load "org-docs/videos.org"
             agenda <- load "org-sections/meeting-planner.org"
             tutorials <- load "org-docs/tutorials.org"
+            documents <- load "org-docs/documents.org"
             milestones <- load "Milestones"
             let indexCtx =
                     itemField "videos" videos `mappend`
                     itemField "agenda" agenda `mappend`
                     itemField "Milestones" milestones `mappend`
                     itemField "tutorials" tutorials `mappend`
+                    itemField "documents" documents `mappend`
                     constField "title" "Gear Girls Info" `mappend`
                     defaultContext
             getResourceBody
