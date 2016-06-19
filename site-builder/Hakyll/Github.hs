@@ -1,3 +1,4 @@
+{-# LANGUAGE DataKinds #-}
 {-# LANGUAGE NamedFieldPuns    #-}
 {-# LANGUAGE OverloadedStrings #-}
 
@@ -26,7 +27,8 @@ import           Data.Default
 import           Data.Maybe                      (fromMaybe)
 import           Data.Monoid                     (mconcat)
 import           Data.Time
-import           Github.Issues.Milestones
+import           GitHub.Endpoints.Issues.Milestones
+import qualified Data.Text as Text
 import           Hakyll
 import           Text.Blaze.Html.Renderer.Pretty
 import           Text.Blaze.XHtml5
@@ -34,6 +36,8 @@ import qualified Text.Blaze.XHtml5               as H
 import           Text.Blaze.XHtml5.Attributes
 import           Text.Pandoc.Readers.Markdown
 import           Text.Pandoc.Writers.HTML
+import           Data.Proxy 
+
 
 milestonesCompiler :: [Milestone] -> Compiler (Item String)
 milestonesCompiler = makeItem . renderTableMilestones
@@ -44,12 +48,13 @@ renderTableMilestones = renderHtml . tableMilestones
 testMilestone :: Milestone
 testMilestone = Milestone owner dueDate 3 43 0 description title url fixedDate state
   where
-    owner = GithubUser "my baby" "takes the" "morning train" 3 Nothing
-    dueDate@(Just fixedDate) = fmap GithubDate . parseTimeM True defaultTimeLocale
-                                                            (iso8601DateFormat  (Just "%H:%M:%S")) $ "2015-03-20T03:00:00" :: Maybe GithubDate
+    userid = mkId (Proxy :: Proxy User) 1 
+    owner = SimpleUser userid "user name" (URL "takes the") (URL "test") OwnerUser 
+    dueDate@(Just fixedDate) = parseTimeM True defaultTimeLocale
+                                          (iso8601DateFormat  (Just "%H:%M:%S")) $ "2015-03-20T03:00:00" :: Maybe UTCTime
     description = Just "Here is a brilliant description"
     title = "Test Milestone"
-    url = "test url"
+    url = URL "test url"
     state = "Standard"
 
 tableMilestones milestones = tableWithAttrs .tbody.mappend header .mconcat . fmap (trWithAttrs.tdMilestone) $ milestones
@@ -74,16 +79,16 @@ tdMilestone mileStone = mconcat dataLine
    milestoneState }) = mileStone
   dataLine :: [Html]
   dataLine = td <$> [ toHtml milestoneNumber
-                    , renderLinkWithTitle (toHtml milestoneTitle) (stringValue milestoneUrl)
+                    , renderLinkWithTitle (toHtml milestoneTitle) (stringValue . show $ milestoneUrl)
                     , toHtml.maybe "" renderGithubDate $ milestoneDueOn
-                    , toHtml.renderDescription $ milestoneDescription
+                    , toHtml.renderDescription . fmap Text.unpack  $ milestoneDescription
                     , (H.span ! class_ "label label-success") . toHtml $ milestoneState]
 
 
 -- | Render Help
 
-renderGithubDate :: GithubDate -> String
-renderGithubDate = formatTimeISO.fromGithubDate
+renderGithubDate :: UTCTime -> String
+renderGithubDate = formatTimeISO
    where
       formatTimeISO = formatTime defaultTimeLocale (iso8601DateFormat  (Just "%H:%M:%S"))
 

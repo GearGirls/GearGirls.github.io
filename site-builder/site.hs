@@ -2,8 +2,9 @@
 {-# LANGUAGE OverloadedStrings #-}
 
 import           Data.Monoid              (mappend)
-import           Github.Issues.Milestones
+import           GitHub.Endpoints.Issues.Milestones
 import           Hakyll
+import qualified Data.Vector as Vector
 import           Hakyll.Core.Compiler
 import           Hakyll.Core.Identifier
 import           Hakyll.Github
@@ -37,7 +38,7 @@ main = do
             loadAndApplyTemplate "templates/section.html" (constField "title" "" `mappend` defaultContext)
     create ["Milestones"] $ compile $ do
           section <- loadBody "templates/section.html"
-          milestonesCompiler gear >>=
+          milestonesCompiler (Vector.toList gear) >>=
                     applyTemplate section (constField "title" "Work needing to be done" `mappend` defaultContext)
     match "index.html" $ do
         route idRoute
